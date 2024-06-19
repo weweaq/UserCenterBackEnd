@@ -2,6 +2,10 @@ package com.example.usercenterbackend.service;
 
 import com.example.usercenterbackend.model.User;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.example.usercenterbackend.model.UserVo;
+
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
 
 /**
 * @author 122
@@ -9,5 +13,13 @@ import com.baomidou.mybatisplus.extension.service.IService;
 * @createDate 2024-06-14 22:26:29
 */
 public interface UserService extends IService<User> {
+
+    public static final String SALT = "weweaqa";
+
+    String USER_LOGIN_STATE = "user_login_state";
+
+    long userRegister(String account, String password, String checkPassword);
+
+    UserVo userLogin(String account, String password, HttpServletRequest request);
 
 }

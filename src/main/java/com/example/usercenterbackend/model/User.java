@@ -6,14 +6,21 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.util.Date;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * 用户表
  * @TableName user
  */
-@TableName(value ="user")
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@TableName(value ="user")
 public class User implements Serializable {
     /**
      * 

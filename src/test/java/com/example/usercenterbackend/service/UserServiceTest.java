@@ -1,19 +1,25 @@
 package com.example.usercenterbackend.service;
 
+import com.example.usercenterbackend.mapper.UserMapper;
 import com.example.usercenterbackend.model.User;
+import com.example.usercenterbackend.model.UserVo;
 import org.junit.Before;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
-
-import static org.junit.Assert.*;
+import java.util.List;
 
 @SpringBootTest
 public class UserServiceTest {
     @Resource
     UserService uerService;
+
+    @Resource
+    UserMapper userMapper;
 
     @Before
     public void setUp() throws Exception {
@@ -40,5 +46,28 @@ public class UserServiceTest {
         System.out.println(save);
 
 
+    }
+
+
+    @Test
+    public void testSelectUser(){
+        List<User> users = userMapper.selectList(null);
+
+        for (User user : users) {
+            System.out.println(user);
+        }
+    }
+
+    @Test
+    void userRegister() {
+        long weTest001 = uerService.userRegister("weTest001", "12345678", "12345678");
+        assert weTest001 > 0;
+    }
+
+    @Test
+    void userLogin() {
+        UserVo weTest001 = uerService.userLogin("weTest001", "12345678", null );
+        System.out.println(weTest001);
+        assert weTest001 != null;
     }
 }
