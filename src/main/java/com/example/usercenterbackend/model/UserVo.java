@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.BeanUtils;
 
 import java.util.Date;
 
@@ -62,4 +63,7 @@ public class UserVo {
      */
     private Date updateTime;
 
+    public UserVo(User user) {
+        BeanUtils.copyProperties(user, this);
+    }
 }

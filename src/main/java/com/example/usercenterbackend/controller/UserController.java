@@ -6,13 +6,11 @@ import com.example.usercenterbackend.model.RegisterReq;
 import com.example.usercenterbackend.model.UserVo;
 import com.example.usercenterbackend.service.UserService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -38,5 +36,22 @@ public class UserController {
         log.info("userLogin finished rsp:[{}]", userVo);
         return userVo;
     }
+
+    @PostMapping("/select")
+    public List<UserVo> userSelect(@RequestBody String userName, HttpServletRequest request){
+        log.info("userFind start req:[{}]", userName);
+        List<UserVo> userVos = userService.userSelect(userName, request);
+        log.info("userFind finished rsp:[{}]", userVos);
+        return userVos;
+    }
+
+    @PostMapping("/delete")
+    public Boolean userDelete(@RequestBody long userId, HttpServletRequest request){
+        log.info("userDelete start req:[{}]", userId);
+        boolean isDeleted = userService.userDelete(userId, request);
+        log.info("userFind finished rsp:[{}]", isDeleted);
+        return isDeleted;
+    }
+
 
 }

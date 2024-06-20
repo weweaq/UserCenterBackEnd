@@ -2,19 +2,22 @@ package com.example.usercenterbackend.service.impl;
 
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.example.usercenterbackend.constant.UserType;
 import com.example.usercenterbackend.model.User;
 import com.example.usercenterbackend.model.UserVo;
 import com.example.usercenterbackend.service.UserService;
 import com.example.usercenterbackend.mapper.UserMapper;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * @author 122
@@ -54,13 +57,47 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         }
 
         User entity = new LambdaQueryChainWrapper<>(userMapper).eq(User::getUserAccount, account).eq(User::getUserPassword, DigestUtils.md5DigestAsHex((SALT + password).getBytes(StandardCharsets.UTF_8))).one();
-
-        UserVo userVo = new UserVo();
-        BeanUtils.copyProperties(entity, userVo);
-        if (!Objects.isNull(request)){
-            request.getSession().setAttribute(USER_LOGIN_STATE, userVo);
+        if (!Objects.isNull(request)) {
+            request.getSession().setAttribute(USER_LOGIN_STATE, entity);
         }
-        return userVo;
+        return new UserVo(entity);
+    }
+
+    @Override
+    public List<UserVo> userSelect(String name, HttpServletRequest request) {
+        if (StringUtils.isAnyBlank(name)) {
+            log.error("invalid name in userSelect!");
+            return Collections.emptyList();
+        }
+        if (isAdminUser(request)){
+            return Collections.emptyList();
+        }
+        List<User> list = new LambdaQueryChainWrapper<>(userMapper).like(User::getUserName, name).list();
+        return list.stream().map(UserVo::new).collect(Collectors.toList());
+    }
+
+    private boolean isAdminUser(HttpServletRequest request) {
+        Object attribute = request.getSession().getAttribute(USER_LOGIN_STATE);
+        if (attribute == null) {
+            log.error("user not login in userSelect!");
+            return true;
+        }
+
+        // TODO: 2024/6/20 把用户类型整成枚举
+        User user = (User) attribute;
+        if (user.getUserType() != UserType.ADMIN_USER) {
+            log.error("invalid user type in userSelect!");
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean userDelete(long id, HttpServletRequest request) {
+        if (isAdminUser(request)){
+            return false;
+        }
+        return userMapper.deleteById(id) == 1;
     }
 
     private Integer checkPassedInValid(String account, String password, String checkPassword) {

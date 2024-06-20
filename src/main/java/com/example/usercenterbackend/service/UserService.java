@@ -4,8 +4,8 @@ import com.example.usercenterbackend.model.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.example.usercenterbackend.model.UserVo;
 
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
 * @author 122
@@ -21,5 +21,9 @@ public interface UserService extends IService<User> {
     long userRegister(String account, String password, String checkPassword);
 
     UserVo userLogin(String account, String password, HttpServletRequest request);
+
+    List<UserVo> userSelect(String name, HttpServletRequest request);
+
+    boolean userDelete(long id, HttpServletRequest request);
 
 }

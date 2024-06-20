@@ -1,9 +1,7 @@
 package com.example.usercenterbackend.model;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -37,6 +35,11 @@ public class User implements Serializable {
      * 账号
      */
     private String userAccount;
+
+    /**
+     * 账号
+     */
+    private Integer userType;
 
     /**
      * 用户头像
@@ -81,6 +84,7 @@ public class User implements Serializable {
     /**
      * 是否删除
      */
+    @TableLogic
     private Integer deleted;
 
     @TableField(exist = false)
