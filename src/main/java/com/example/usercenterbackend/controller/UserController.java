@@ -14,7 +14,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/api/user")
 public class UserController {
 
     @Resource
@@ -38,16 +38,16 @@ public class UserController {
     }
 
     // TODO: 2024/6/20 @RequestBody是什么注解，咋整的？get方法用什么传参？ 
-    @PostMapping("/select")
-    public List<UserVo> userSelect(@RequestBody String userName, HttpServletRequest request){
+    @GetMapping("/select")
+    public List<UserVo> userSelect(@RequestParam String userName, HttpServletRequest request){
         log.info("userFind start req:[{}]", userName);
         List<UserVo> userVos = userService.userSelect(userName, request);
         log.info("userFind finished rsp:[{}]", userVos);
         return userVos;
     }
 
-    @PostMapping("/delete")
-    public Boolean userDelete(@RequestBody long userId, HttpServletRequest request){
+    @DeleteMapping("/delete")
+    public Boolean userDelete(@RequestParam long userId, HttpServletRequest request){
         log.info("userDelete start req:[{}]", userId);
         boolean isDeleted = userService.userDelete(userId, request);
         log.info("userFind finished rsp:[{}]", isDeleted);
