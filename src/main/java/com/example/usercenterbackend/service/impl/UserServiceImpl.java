@@ -2,6 +2,9 @@ package com.example.usercenterbackend.service.impl;
 
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.example.usercenterbackend.common.CommonErrorCode;
+import com.example.usercenterbackend.common.CommonRsp;
+import com.example.usercenterbackend.common.exception.BusinessException;
 import com.example.usercenterbackend.constant.UserType;
 import com.example.usercenterbackend.model.User;
 import com.example.usercenterbackend.model.UserVo;
@@ -34,9 +37,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     UserMapper userMapper;
 
     @Override
-    public long userRegister(String account, String password, String checkPassword) {
+    public CommonRsp<Long> userRegister(String account, String password, String checkPassword) {
         Integer x = checkPassedInValid(account, password, checkPassword);
-        if (x != null) return x;
+        if (x != null) {
+            throw new BusinessException(CommonErrorCode.PARAMS_ERROR, "用户注册过程的用户输入参数有问题");
+        };
 
         String digestAsHexPassword = DigestUtils.md5DigestAsHex((SALT + password).getBytes(StandardCharsets.UTF_8));
 
@@ -44,15 +49,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
         int insertCount = userMapper.insert(entity);
         if (insertCount != 1) {
-            return -8;
+            return CommonRsp.fail(CommonErrorCode.INSERT_FAILED, "用户注册失败");
         }
 
         System.out.println("userRegister success, user id: [].");
-        return entity.getId();
+        return CommonRsp.success(entity.getId());
     }
 
     @Override
-    public UserVo userLogin(String account, String password, HttpServletRequest request) {
+    public CommonRsp<UserVo> userLogin(String account, String password, HttpServletRequest request) {
         Integer checkPassword = checkAccountAndPassword(account, password, "checkPassword");
         if (!Objects.isNull(checkPassword)) {
             return null;
@@ -62,7 +67,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         if (!Objects.isNull(request)) {
             request.getSession().setAttribute(USER_LOGIN_STATE, entity);
         }
-        return new UserVo(entity);
+        return CommonRsp.success(new UserVo(entity));
     }
 
     @Override
@@ -74,16 +79,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     }
 
     @Override
-    public List<UserVo> userSelect(String name, HttpServletRequest request) {
+    public CommonRsp<List<UserVo>> userSelect(String name, HttpServletRequest request) {
 //        if (StringUtils.isAnyBlank(name)) {
 //            log.error("invalid name in userSelect!");
 //            return Collections.emptyList();
 //        }
-        if (isAdminUser(request)){
-            return Collections.emptyList();
+        if (isAdminUser(request)) {
+            return CommonRsp.success(Collections.emptyList());
         }
-        List<User> list = new LambdaQueryChainWrapper<>(userMapper).like(Objects.nonNull(name),User::getUserName, name).list();
-        return list.stream().map(UserVo::new).collect(Collectors.toList());
+        List<User> list = new LambdaQueryChainWrapper<>(userMapper).like(Objects.nonNull(name), User::getUserName, name).list();
+        return CommonRsp.success(list.stream().map(UserVo::new).collect(Collectors.toList()));
     }
 
     private boolean isAdminUser(HttpServletRequest request) {
@@ -103,26 +108,26 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     }
 
     @Override
-    public boolean userDelete(long id, HttpServletRequest request) {
-        if (isAdminUser(request)){
-            return false;
+    public CommonRsp<Boolean> userDelete(long id, HttpServletRequest request) {
+        if (isAdminUser(request)) {
+            return CommonRsp.fail(false);
         }
-        return userMapper.deleteById(id) == 1;
+        return CommonRsp.success(userMapper.deleteById(id) == 1);
     }
 
     @Override
-    public UserVo queryCurrentState(HttpServletRequest request) {
+    public CommonRsp<UserVo> queryCurrentState(HttpServletRequest request) {
         Object attribute = request.getSession().getAttribute(USER_LOGIN_STATE);
-        if (Objects.isNull(attribute)){
+        if (Objects.isNull(attribute)) {
             log.info("no valid session for user.");
             return null;
         }
         User user = (User) attribute;
         user = userMapper.selectById(user.getId());
-        if (Objects.isNull(user)){
+        if (Objects.isNull(user)) {
             log.warn("no valid user by session info.");
         }
-        return new UserVo(user);
+        return CommonRsp.success(new UserVo(user));
     }
 
     private Integer checkPassedInValid(String account, String password, String checkPassword) {

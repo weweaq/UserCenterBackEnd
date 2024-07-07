@@ -1,6 +1,7 @@
 package com.example.usercenterbackend.controller;
 
 
+import com.example.usercenterbackend.common.CommonRsp;
 import com.example.usercenterbackend.model.LoginReq;
 import com.example.usercenterbackend.model.RegisterReq;
 import com.example.usercenterbackend.model.UserVo;
@@ -21,26 +22,25 @@ public class UserController {
     UserService userService;
 
     @GetMapping("/current")
-    public UserVo queryCurrentState(HttpServletRequest request) {
+    public CommonRsp<UserVo> queryCurrentState(HttpServletRequest request) {
         log.info("queryCurrentState start");
-        UserVo userVo = userService.queryCurrentState(request);
+        CommonRsp<UserVo> userVo = userService.queryCurrentState(request);
         log.info("queryCurrentState finish");
         return userVo;
     }
 
     @PostMapping("/register")
-    public Long userRegister(@RequestBody RegisterReq req) {
+    public CommonRsp<Long> userRegister(@RequestBody RegisterReq req) {
         log.info("userRegister start req:[{}]", req);
-        long userId = userService.userRegister(req.getAccount(), req.getPassword(), req.getCheckPassword());
-        log.info("userRegister finished rsp:[{}]", userId);
-
-        return userId;
+        CommonRsp<Long> rsp = userService.userRegister(req.getAccount(), req.getPassword(), req.getCheckPassword());
+        log.info("userRegister finished rsp:[{}]", rsp);
+        return rsp;
     }
 
     @PostMapping("/login")
-    public UserVo userLogin(@RequestBody LoginReq req, HttpServletRequest request) {
+    public CommonRsp<UserVo> userLogin(@RequestBody LoginReq req, HttpServletRequest request) {
         log.info("userLogin start req:[{}]", req);
-        UserVo userVo = userService.userLogin(req.getAccount(), req.getPassword(), request);
+        CommonRsp<UserVo> userVo = userService.userLogin(req.getAccount(), req.getPassword(), request);
         log.info("userLogin finished rsp:[{}]", userVo);
         return userVo;
     }
@@ -51,17 +51,17 @@ public class UserController {
     }
 
     @GetMapping("/select")
-    public List<UserVo> userSelect(@RequestParam(required = false) String userName, HttpServletRequest request) {
+    public CommonRsp<List<UserVo>> userSelect(@RequestParam(required = false) String userName, HttpServletRequest request) {
         log.info("userSelect start req:[{}]", userName);
-        List<UserVo> userVos = userService.userSelect(userName, request);
+        CommonRsp<List<UserVo>> userVos = userService.userSelect(userName, request);
         log.info("userSelect finished rsp:[{}]", userVos);
         return userVos;
     }
 
     @DeleteMapping("/delete")
-    public Boolean userDelete(@RequestParam long userId, HttpServletRequest request) {
+    public CommonRsp<Boolean>  userDelete(@RequestParam long userId, HttpServletRequest request) {
         log.info("userDelete start req:[{}]", userId);
-        boolean isDeleted = userService.userDelete(userId, request);
+        CommonRsp<Boolean> isDeleted = userService.userDelete(userId, request);
         log.info("userFind finished rsp:[{}]", isDeleted);
         return isDeleted;
     }

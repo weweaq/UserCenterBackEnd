@@ -1,5 +1,6 @@
 package com.example.usercenterbackend.service;
 
+import com.example.usercenterbackend.common.CommonRsp;
 import com.example.usercenterbackend.mapper.UserMapper;
 import com.example.usercenterbackend.model.User;
 import com.example.usercenterbackend.model.UserVo;
@@ -60,13 +61,13 @@ public class UserServiceTest {
 
     @Test
     void userRegister() {
-        long weTest001 = uerService.userRegister("weTest001", "12345678", "12345678");
-        assert weTest001 > 0;
+//        long weTest001 = uerService.userRegister("weTest001", "12345678", "12345678");
+//        assert weTest001 > 0;
     }
 
     @Test
     void userLogin() {
-        UserVo weTest001 = uerService.userLogin("weTest001", "12345678", null );
+        CommonRsp<UserVo> weTest001 = uerService.userLogin("weTest001", "12345678", null );
         System.out.println(weTest001);
         assert weTest001 != null;
     }

@@ -1,5 +1,6 @@
 package com.example.usercenterbackend.service;
 
+import com.example.usercenterbackend.common.CommonRsp;
 import com.example.usercenterbackend.model.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.example.usercenterbackend.model.UserVo;
@@ -18,16 +19,16 @@ public interface UserService extends IService<User> {
 
     String USER_LOGIN_STATE = "user_login_state";
 
-    long userRegister(String account, String password, String checkPassword);
+    CommonRsp<Long> userRegister(String account, String password, String checkPassword);
 
-    UserVo userLogin(String account, String password, HttpServletRequest request);
+    CommonRsp<UserVo> userLogin(String account, String password, HttpServletRequest request);
 
     void userLogout(HttpServletRequest request);
 
-    List<UserVo> userSelect(String name, HttpServletRequest request);
+    CommonRsp<List<UserVo>> userSelect(String name, HttpServletRequest request);
 
-    boolean userDelete(long id, HttpServletRequest request);
+    CommonRsp<Boolean> userDelete(long id, HttpServletRequest request);
 
-    UserVo queryCurrentState(HttpServletRequest request);
+    CommonRsp<UserVo> queryCurrentState(HttpServletRequest request);
 
 }
