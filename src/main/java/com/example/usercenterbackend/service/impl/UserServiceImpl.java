@@ -7,6 +7,7 @@ import com.example.usercenterbackend.model.User;
 import com.example.usercenterbackend.model.UserVo;
 import com.example.usercenterbackend.service.UserService;
 import com.example.usercenterbackend.mapper.UserMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
  * @description 针对表【user(用户表)】的数据库操作Service实现
  * @createDate 2024-06-14 22:26:29
  */
+@Slf4j
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         implements UserService {
@@ -64,15 +66,23 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     }
 
     @Override
-    public List<UserVo> userSelect(String name, HttpServletRequest request) {
-        if (StringUtils.isAnyBlank(name)) {
-            log.error("invalid name in userSelect!");
-            return Collections.emptyList();
+    public void userLogout(HttpServletRequest request) {
+        if (Objects.isNull(request)) {
+            throw new RuntimeException("request 不可为null");
         }
+        request.getSession().removeAttribute(USER_LOGIN_STATE);
+    }
+
+    @Override
+    public List<UserVo> userSelect(String name, HttpServletRequest request) {
+//        if (StringUtils.isAnyBlank(name)) {
+//            log.error("invalid name in userSelect!");
+//            return Collections.emptyList();
+//        }
         if (isAdminUser(request)){
             return Collections.emptyList();
         }
-        List<User> list = new LambdaQueryChainWrapper<>(userMapper).like(User::getUserName, name).list();
+        List<User> list = new LambdaQueryChainWrapper<>(userMapper).like(Objects.nonNull(name),User::getUserName, name).list();
         return list.stream().map(UserVo::new).collect(Collectors.toList());
     }
 
@@ -98,6 +108,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             return false;
         }
         return userMapper.deleteById(id) == 1;
+    }
+
+    @Override
+    public UserVo queryCurrentState(HttpServletRequest request) {
+        Object attribute = request.getSession().getAttribute(USER_LOGIN_STATE);
+        if (Objects.isNull(attribute)){
+            log.info("no valid session for user.");
+            return null;
+        }
+        User user = (User) attribute;
+        user = userMapper.selectById(user.getId());
+        if (Objects.isNull(user)){
+            log.warn("no valid user by session info.");
+        }
+        return new UserVo(user);
     }
 
     private Integer checkPassedInValid(String account, String password, String checkPassword) {

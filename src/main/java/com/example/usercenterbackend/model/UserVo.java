@@ -54,6 +54,12 @@ public class UserVo {
     private Integer userStatus;
 
     /**
+     * 账号
+     */
+    private Integer userType;
+
+
+    /**
      * 创建时间
      */
     private Date createTime;

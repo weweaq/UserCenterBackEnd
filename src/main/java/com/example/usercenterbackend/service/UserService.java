@@ -8,10 +8,10 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
-* @author 122
-* @description 针对表【user(用户表)】的数据库操作Service
-* @createDate 2024-06-14 22:26:29
-*/
+ * @author 122
+ * @description 针对表【user(用户表)】的数据库操作Service
+ * @createDate 2024-06-14 22:26:29
+ */
 public interface UserService extends IService<User> {
 
     public static final String SALT = "weweaqa";
@@ -22,8 +22,12 @@ public interface UserService extends IService<User> {
 
     UserVo userLogin(String account, String password, HttpServletRequest request);
 
+    void userLogout(HttpServletRequest request);
+
     List<UserVo> userSelect(String name, HttpServletRequest request);
 
     boolean userDelete(long id, HttpServletRequest request);
+
+    UserVo queryCurrentState(HttpServletRequest request);
 
 }

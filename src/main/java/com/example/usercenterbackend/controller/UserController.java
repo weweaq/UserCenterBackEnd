@@ -20,8 +20,16 @@ public class UserController {
     @Resource
     UserService userService;
 
+    @GetMapping("/current")
+    public UserVo queryCurrentState(HttpServletRequest request) {
+        log.info("queryCurrentState start");
+        UserVo userVo = userService.queryCurrentState(request);
+        log.info("queryCurrentState finish");
+        return userVo;
+    }
+
     @PostMapping("/register")
-    public Long userRegister(@RequestBody RegisterReq req){
+    public Long userRegister(@RequestBody RegisterReq req) {
         log.info("userRegister start req:[{}]", req);
         long userId = userService.userRegister(req.getAccount(), req.getPassword(), req.getCheckPassword());
         log.info("userRegister finished rsp:[{}]", userId);
@@ -30,24 +38,28 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public UserVo userLogin(@RequestBody LoginReq req, HttpServletRequest request){
+    public UserVo userLogin(@RequestBody LoginReq req, HttpServletRequest request) {
         log.info("userLogin start req:[{}]", req);
-        UserVo userVo = userService.userLogin(req.getAccount(), req.getPassword(),  request);
+        UserVo userVo = userService.userLogin(req.getAccount(), req.getPassword(), request);
         log.info("userLogin finished rsp:[{}]", userVo);
         return userVo;
     }
 
-    // TODO: 2024/6/20 @RequestBody是什么注解，咋整的？get方法用什么传参？ 
+    @PostMapping("/logout")
+    public void userLogout(HttpServletRequest request) {
+        userService.userLogout(request);
+    }
+
     @GetMapping("/select")
-    public List<UserVo> userSelect(@RequestParam String userName, HttpServletRequest request){
-        log.info("userFind start req:[{}]", userName);
+    public List<UserVo> userSelect(@RequestParam(required = false) String userName, HttpServletRequest request) {
+        log.info("userSelect start req:[{}]", userName);
         List<UserVo> userVos = userService.userSelect(userName, request);
-        log.info("userFind finished rsp:[{}]", userVos);
+        log.info("userSelect finished rsp:[{}]", userVos);
         return userVos;
     }
 
     @DeleteMapping("/delete")
-    public Boolean userDelete(@RequestParam long userId, HttpServletRequest request){
+    public Boolean userDelete(@RequestParam long userId, HttpServletRequest request) {
         log.info("userDelete start req:[{}]", userId);
         boolean isDeleted = userService.userDelete(userId, request);
         log.info("userFind finished rsp:[{}]", isDeleted);
