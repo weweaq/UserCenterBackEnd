@@ -45,8 +45,6 @@ public class UserServiceTest {
         user.setUpdateTime(new Date());
         user.setDeleted(0);
 
-        boolean save = uerService.save(user);
-        System.out.println(save);
 
 
     }
